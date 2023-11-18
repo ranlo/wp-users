@@ -16,7 +16,7 @@ def get_wordpress_users_info(domain):
 
         while has_next_page:
             # Check if there is a WordPress users page
-            users_url = f"http://{domain}/wp-json/wp/v2/users?page={page}&per_page={per_page}"
+            users_url = f"https://{domain}/wp-json/wp/v2/users?page={page}&per_page={per_page}"
             response = requests.get(users_url)
 
             # Check for HTTP errors
