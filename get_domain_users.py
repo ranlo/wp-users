@@ -2,8 +2,9 @@ import sys
 import requests
 import csv
 import re
+import argparse
 
-def get_wordpress_users_info(domain):
+def get_wordpress_users_info(domain, no_header=False):
     # Initialize variables for pagination
     page = 1
     per_page = 50
@@ -26,7 +27,7 @@ def get_wordpress_users_info(domain):
                 users_data = response.json()
 
                 # Output CSV header if it's the first page
-                if page == 1:
+                if page == 1 and not no_header:
                     csv_writer.writerow(["Domain", "Name", "Slug", "Gravatar Hash"])
 
                 for user in users_data:
@@ -61,17 +62,16 @@ def get_wordpress_users_info(domain):
     print(f"Processing for {domain} completed. CSV file saved as {domain}_users.csv")
 
 if __name__ == "__main__":
-    # Check if a domain name is provided as a command line argument
-    if len(sys.argv) != 2:
-        print("Usage: python script.py <domain>")
-        sys.exit(1)
+    # Set up argument parser
+    parser = argparse.ArgumentParser(description="Get WordPress user information from a domain.")
+    parser.add_argument("domain", help="The domain name to check for WordPress users.")
+    parser.add_argument("--no-header", action="store_true", help="Do not include a header in the CSV file.")
 
-    # Read domain name from command line argument
-    domain = sys.argv[1]
+    args = parser.parse_args()
 
     # Validate domain name (optional)
     # You may want to add additional validation based on your requirements
 
-    print(f"Processing users for {domain}...")
+    print(f"Processing users for {args.domain}...")
 
-    get_wordpress_users_info(domain)
+    get_wordpress_users_info(args.domain, args.no_header)

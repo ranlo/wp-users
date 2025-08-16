@@ -18,23 +18,37 @@ This script extracts user information from a WordPress-powered website and saves
 
 ## Usage
 
-To use the script, run it from the command line and provide the domain name of the WordPress site as an argument:
+To use the script, run it from the command line:
 
 ```bash
-python3 get_domain_users.py <domain>
+python3 get_domain_users.py [-h] [--no-header] domain
 ```
 
-Replace `<domain>` with the actual domain name you want to target (e.g., `example.com`).
+### Arguments
+
+*   `domain`: The domain name of the WordPress site to scan.
+*   `-h`, `--help`: Show a help message and exit.
+*   `--no-header`: Do not write a header row in the CSV output file.
 
 The script will create a CSV file named `<domain>_users.csv` in the same directory.
 
 ### Example
 
+**Standard Usage**
+
+To get users from `example.com` and save them to `example.com_users.csv` with a header row:
+
 ```bash
 python3 get_domain_users.py example.com
 ```
 
-This will generate a file named `example.com_users.csv` with the user data from that site.
+**No-Header Mode**
+
+To get users from `example.com` but without a header row in the CSV:
+
+```bash
+python3 get_domain_users.py example.com --no-header
+```
 
 ## How It Works
 

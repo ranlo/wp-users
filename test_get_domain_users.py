@@ -31,7 +31,7 @@ def test_single_page_of_users(mocker):
 
     mocker.patch('requests.get', return_value=mock_response)
 
-    get_wordpress_users_info(domain)
+    get_wordpress_users_info(domain, no_header=False)
 
     output_file = f"{domain}_users.csv"
     assert os.path.exists(output_file)
@@ -66,7 +66,7 @@ def test_multiple_pages_of_users(mocker):
     # Set up the mock to return different values on subsequent calls
     mocker.patch('requests.get', side_effect=[mock_response_page1, mock_response_page2])
 
-    get_wordpress_users_info(domain)
+    get_wordpress_users_info(domain, no_header=False)
 
     output_file = f"{domain}_users.csv"
     assert os.path.exists(output_file)
@@ -89,7 +89,7 @@ def test_api_error(mocker):
     mocker.patch('requests.get', return_value=mock_response)
 
     with pytest.raises(requests.exceptions.HTTPError):
-        get_wordpress_users_info(domain)
+        get_wordpress_users_info(domain, no_header=False)
 
     output_file = f"{domain}_users.csv"
     assert os.path.exists(output_file)
@@ -108,7 +108,7 @@ def test_no_users(mocker):
 
     mocker.patch('requests.get', return_value=mock_response)
 
-    get_wordpress_users_info(domain)
+    get_wordpress_users_info(domain, no_header=False)
 
     output_file = f"{domain}_users.csv"
     assert os.path.exists(output_file)
@@ -119,3 +119,30 @@ def test_no_users(mocker):
         # The header should be written, but no user rows.
         assert len(rows) == 1
         assert rows[0] == ["Domain", "Name", "Slug", "Gravatar Hash"]
+
+def test_no_header_mode(mocker):
+    """Test that the script can run in no-header mode."""
+    domain = "noheader.com"
+    mock_response = MagicMock()
+    mock_response.status_code = 200
+    mock_response.headers = {}
+    mock_response.json.return_value = [
+        {
+            "name": "Dave",
+            "slug": "dave",
+            "avatar_urls": {"96": "https://secure.gravatar.com/avatar/67890"},
+        }
+    ]
+
+    mocker.patch('requests.get', return_value=mock_response)
+
+    get_wordpress_users_info(domain, no_header=True)
+
+    output_file = f"{domain}_users.csv"
+    assert os.path.exists(output_file)
+
+    with open(output_file, mode='r') as csv_file:
+        reader = csv.reader(csv_file)
+        rows = list(reader)
+        assert len(rows) == 1
+        assert rows[0] == [domain, "Dave", "dave", "67890"]
